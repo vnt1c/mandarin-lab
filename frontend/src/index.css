@@ -1,0 +1,138 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+All colors MUST be HSL.
+*/
+
+@layer base {
+  :root {
+    /* Chinese Learning Theme - Watercolor Aesthetic */
+    --background: 45 60% 97%;
+    --foreground: 220 15% 15%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 220 15% 15%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 15% 15%;
+
+    /* Sage primary */
+    --primary: 160 28% 56%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Sky accent */
+    --secondary: 202 40% 68%;
+    --secondary-foreground: 220 15% 15%;
+
+    /* Cream muted */
+    --muted: 45 60% 94%;
+    --muted-foreground: 220 10% 45%;
+
+    /* Sky accent for highlights */
+    --accent: 202 40% 68%;
+    --accent-foreground: 220 15% 15%;
+
+    --destructive: 0 70% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 160 20% 88%;
+    --input: 160 20% 88%;
+    --ring: 160 28% 56%;
+
+    --radius: 1rem;
+
+    /* Glass effect */
+    --glass-bg: 0 0% 100% / 0.7;
+    --glass-border: 160 20% 88% / 0.5;
+
+    /* Sidebar */
+    --sidebar-background: 45 40% 98%;
+    --sidebar-foreground: 220 15% 20%;
+    --sidebar-primary: 160 28% 56%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 202 40% 95%;
+    --sidebar-accent-foreground: 220 15% 20%;
+    --sidebar-border: 160 20% 90%;
+    --sidebar-ring: 160 28% 56%;
+  }
+
+  .dark {
+    --background: 220 20% 8%;
+    --foreground: 45 40% 95%;
+
+    --card: 220 18% 12%;
+    --card-foreground: 45 40% 95%;
+
+    --popover: 220 18% 12%;
+    --popover-foreground: 45 40% 95%;
+
+    --primary: 160 28% 56%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 202 40% 58%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 220 15% 18%;
+    --muted-foreground: 220 10% 60%;
+
+    --accent: 202 40% 58%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 70% 55%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 220 15% 20%;
+    --input: 220 15% 20%;
+    --ring: 160 28% 56%;
+
+    --glass-bg: 220 18% 12% / 0.7;
+    --glass-border: 220 15% 20% / 0.5;
+
+    --sidebar-background: 220 20% 10%;
+    --sidebar-foreground: 45 40% 90%;
+    --sidebar-primary: 160 28% 56%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 220 15% 18%;
+    --sidebar-accent-foreground: 45 40% 90%;
+    --sidebar-border: 220 15% 18%;
+    --sidebar-ring: 160 28% 56%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-body;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-serif;
+  }
+}
+
+@layer utilities {
+  .glass {
+    @apply bg-card/70 backdrop-blur-xl border border-border/50;
+  }
+
+  .glass-strong {
+    @apply bg-card/90 backdrop-blur-2xl border border-border;
+  }
+
+  .shadow-soft {
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  }
+
+  .shadow-elevated {
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
+  }
+
+  .transition-smooth {
+    @apply transition-all duration-300 ease-in-out;
+  }
+}

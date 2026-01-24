@@ -1,0 +1,21 @@
+{
+	"compilerOptions": {
+	  "target": "ES2022",
+	  "module": "ES2022",
+	  "moduleResolution": "node",
+	  "esModuleInterop": true,
+	  "allowSyntheticDefaultImports": true,
+	  "skipLibCheck": true,
+	  "forceConsistentCasingInFileNames": true,
+	  "resolveJsonModule": true,
+	  "isolatedModules": true,
+	  "outDir": "./dist",
+	  "rootDir": "./src"
+	},
+	"include": ["src/**/*", "src/ai"],
+	"exclude": ["node_modules"],
+	"ts-node": {
+	  "esm": true,
+	  "experimentalSpecifierResolution": "node"
+	}
+}
