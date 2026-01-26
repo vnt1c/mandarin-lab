@@ -1,15 +1,24 @@
 import { z } from "zod";
 
-const tokenSchema = z.object({
-  text: z.string().describe(
-    "Chinese text of this token (may be multi-character for idioms/compounds)"
-  ),
-  pinyin: z.string().describe(
-    "Pinyin with tone marks (e.g., 'shìjiè', 'méiyǒu')"
-  ),
-  role: z.enum([
+/**
+ * Enums
+ */
+const formalityEnum = z
+  .enum(["formal", "informal", "very_informal"])
+  .describe("Register/formality level (optional)");
+
+/**
+ * Token-only usage tags (optional)
+ */
+const usageTagEnum = z
+  .enum(["slang", "vulgar", "derogatory", "offensive", "archaic"])
+  .describe("Token usage tag (optional)");
+
+// Keep your POS/role enum as-is
+const roleEnum = z
+  .enum([
     "noun",
-    "pronoun", 
+    "pronoun",
     "verb",
     "adjective",
     "adverb",
@@ -20,40 +29,114 @@ const tokenSchema = z.object({
     "interjection",
     "number",
     "idiom",
-    "aspect_marker", // Add this - for 了, 过, 着
-    "localizer",     // Add this - for 上, 里, 中
-    "modifier",      // Add this - for 地, 得
-  ]).describe(
-    "Part of speech / grammatical role in this sentence"
+    "aspect_marker",
+    "localizer",
+    "modifier",
+  ])
+  .describe("Part of speech / grammatical role in this sentence");
+
+/**
+ * Token schema
+ * - zhuyin is REQUIRED
+ * - formality is OPTIONAL ("formal" | "informal" | "very_informal")
+ * - usage_tags is OPTIONAL and TOKEN-ONLY
+ */
+const tokenSchema = z.object({
+  text: z.string().describe(
+    "Chinese text of this token (may be multi-character for idioms/compounds)"
   ),
+
+  pinyin: z.string().describe(
+    "Pinyin with tone marks (e.g., 'shìjiè', 'méiyǒu')"
+  ),
+
+  zhuyin: z.string().describe(
+    "Zhuyin/Bopomofo for this token"
+  ),
+
+  role: roleEnum,
+
   english: z.string().describe(
     "Contextual English meaning of THIS token in THIS sentence only"
-  )
+  ),
+
+  role_in_sentence: z.string().optional().describe(
+    "Plain-English description of what this token is doing in this sentence"
+  ),
+
+  formality: formalityEnum.optional().describe(
+    "Optional formality/register of this token in this context"
+  ),
+
+  usage_tags: z.array(usageTagEnum).max(3).default([]).describe(
+    "Optional token usage tags (0–3)"
+  ),
 });
 
+/**
+ * Corrections / Suggestions (omit if none)
+ */
+const correctionSchema = z.object({
+  message: z.string().describe(
+    "Short explanation of what to change and why"
+  ),
+
+  corrected_sentence: z.string().describe(
+    "Suggested corrected / more natural sentence"
+  ),
+});
+
+/**
+ * Sentence structures (0–3)
+ */
+const structureSchema = z.object({
+  title: z.string().describe(
+    "Short name, e.g. 'Verb + 不 + Verb / Adj. + 不 + Adj.' or '向 + Direction / Person + Verb'"
+  ),
+
+  highlight: z.string().describe(
+    "The exact text from the sentence representing this sentence structure, unchanged"
+  ),
+
+  rule: z.string().describe(
+    "Plain-English rule that explains how to use this sentence structure"
+  ),
+
+  examples: z.array(
+    z.object({
+      sentence: z.string().describe("Example Chinese sentence"),
+      translation: z.string().describe("English translation of example"),
+    })
+  ).length(2).describe("Exactly 2 examples"),
+});
+
+/**
+ * Sentence schema
+ */
 export const sentenceAnalysisSchema = z.object({
   sentence: z.string().describe(
     "The original Chinese sentence exactly as provided by the user, unchanged."
   ),
 
   translation: z.string().describe(
-    "A natural, fluent English translation of the entire sentence. This must be a complete sentence in English, not a word-by-word gloss."
-  ),
-
-  tokens: z.array(tokenSchema).min(1).describe(
-    "A list of tokens in the order they appear in the sentence. Each token represents a meaningful word, phrase, or fixed expression used in the sentence."
+    "A natural, fluent English translation of the entire sentence."
   ),
 
   example_context: z.string().describe(
-    "A concise English description of realistic situations where this sentence would naturally be used, such as conversational speech, formal writing, academic discussion, professional communication, or narrative prose."
+    "Realistic situations where this sentence would naturally be used."
   ),
 
-  additional_notes: z.array(z.string()).describe(
-    "An array of helpful English notes highlighting non-obvious grammar points, register issues, common learner mistakes, or nuances in meaning or usage. Each note should be a concise bullet point. Do not repeat the translation or token explanations."
+  correction: correctionSchema.optional().describe(
+    "Correction/suggestion; omit if none"
+  ),
+
+  structures: z.array(structureSchema).max(3).default([]).describe(
+    "0–3 reusable sentence structures"
+  ),
+
+  tokens: z.array(tokenSchema).min(1).describe(
+    "Tokens in order of appearance"
   ),
 });
 
-
-export type SentenceAnalysis = z.infer<
-  typeof sentenceAnalysisSchema
->;
+export type SentenceAnalysis = z.infer<typeof sentenceAnalysisSchema>;

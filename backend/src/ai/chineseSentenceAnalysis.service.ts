@@ -1,6 +1,7 @@
 import { gemini } from "./geminiClient";
 import { buildSentenceAnalysisPrompt } from "./chineseSentenceAnalysis.prompt";
 import { sentenceAnalysisSchema } from "./chineseSentenceAnalysis.schema";
+import { HttpError } from "../lib/HttpError";
 import { z } from "zod";
 
 export async function analyzeChineseSentence(sentence: string) {
@@ -13,9 +14,28 @@ export async function analyzeChineseSentence(sentence: string) {
     },
   });
 
-  const text = (response.text ?? "").trim();
-  if (!text) throw new Error("Gemini returned empty response text");
+  const text = response.text?.trim();
+  if (!text) {
+    throw new HttpError(502, "AI service returned empty response");
+  }
 
-  const json = JSON.parse(text);
-  return sentenceAnalysisSchema.parse(json);
+  let json: unknown;
+  try {
+    json = JSON.parse(text);
+  } catch {
+    throw new HttpError(502, "AI service returned invalid JSON");
+  }
+
+  const parsed = sentenceAnalysisSchema.safeParse(json);
+  if (!parsed.success) {
+    // internal only
+    console.error("Gemini schema violation", parsed.error.issues);
+
+    throw new HttpError(
+      502,
+      "AI service returned an invalid response format"
+    );
+  }
+
+  return parsed.data;
 }

@@ -1,35 +1,25 @@
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
 import { analyzeChineseSentence } from "../ai";
+import { HttpError } from "../lib/HttpError";
+import { validateChineseSentence } from "../lib/validateSentence";
 
-export async function analyzeSentence(
-    req: Request,
-    res: Response
-) {
-    const { sentence } = req.body;
+export async function analyzeSentence(req: Request, res: Response) {
+  const v = validateChineseSentence(req.body?.sentence);
 
-    if (!sentence || typeof sentence !== "string") {
-        return res.status(400).json({ error: "sentence must be a string" });
-    }
+  if (v.ok === false) {
+    throw new HttpError(400, v.message);
+  }
 
-    if (sentence.length > 30) {
-        return res.status(400).json({ error: "sentence must be 30 characters or less" });
-    }
+  const sentence = v.value;
 
-    try {
-        const geminiResult = await analyzeChineseSentence(sentence);
-        
-        // Return the Gemini result directly - it already matches the schema
-        const result = {
-            sentence: geminiResult.sentence,
-            translation: geminiResult.translation,
-            tokens: geminiResult.tokens,
-            example_context: geminiResult.example_context,
-            additional_notes: geminiResult.additional_notes,
-        };
-        
-        res.json(result);
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: "Failed to analyze sentence" });
-    }
-} 
+  const geminiResult = await analyzeChineseSentence(sentence);
+
+  return res.json({
+    sentence: geminiResult.sentence,
+    translation: geminiResult.translation,
+    example_context: geminiResult.example_context,
+    correction: geminiResult.correction,
+    structures: geminiResult.structures,
+    tokens: geminiResult.tokens,
+});
+}
