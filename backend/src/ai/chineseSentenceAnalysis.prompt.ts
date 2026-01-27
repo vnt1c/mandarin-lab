@@ -1,59 +1,60 @@
 export function buildSentenceAnalysisPrompt(sentence: string) {
-  return `You are a Chinese language teacher creating structured learning materials.
+  return `You are a Chinese language teacher producing STRICT JSON learning data.
 
-Analyze the given Chinese sentence and produce a structured breakdown for learners.
+Task: Analyze the Chinese sentence and output ONLY valid JSON (no markdown, no extra text).
 
-GENERAL RULES:
-- Analyze the sentence exactly as written. Do NOT silently fix errors.
-- If the sentence is incorrect or unnatural, include a correction.
-- Always provide a full, natural English translation.
-- Return ONLY valid JSON. No markdown. No explanations outside JSON.
-- Do NOT include any fields that are not listed below.
-- OPTIONAL fields must be OMITTED if they do not apply.
+Hard constraints:
+- Analyze the sentence EXACTLY as written. Do not silently fix or rewrite it.
+- If it is incorrect or clearly unnatural, include a correction field (otherwise OMIT correction).
+- Provide ONE full, natural English translation of the original sentence.
+- Output must include ONLY the fields listed below. Omit any optional field when not needed.
 
-TOKENIZATION RULES:
-1. Multi-character idioms (成语), fixed expressions, and compound words = ONE token
-2. Grammatical particles (的, 了, 吗, etc.) = separate tokens
+Output JSON shape:
+{
+  "sentence": string,
+  "translation": string,
+  "tokens": [
+    {
+      "text": string,
+      "pinyin": string,        // tone marks
+      "zhuyin": string,        // bopomofo
+      "role": string,          // part of speech
+      "english": string,       // contextual meaning in THIS sentence
 
-TOKEN REQUIREMENTS (for each token):
-- text (Chinese)
-- pinyin (with tone marks)
-- zhuyin (Bopomofo)
-- role (part of speech)
-- english (contextual meaning)
+      // OPTIONAL (omit if not applicable)
+      "role_in_sentence"?: string,
+      "formality"?: "formal" | "informal" | "very_informal",
+      "usage_tags"?: ("slang" | "vulgar" | "derogatory" | "offensive" | "archaic")[]
+    }
+  ],
 
-OPTIONAL token fields (omit if not applicable):
-- role_in_sentence
-- formality ("formal" | "informal" | "very_informal")
-- Do not assign formal / informal unless there is a strong reason.
-- usage_tags (array of: slang, vulgar, derogatory, offensive, archaic) (do not be redundant)
+  // OPTIONAL (omit if not needed)
+  "correction"?: { "sentence": string, "notes": string },
+  "structures"?: [
+    {
+      "title": string,
+      "highlight": string,     // exact substring from the input sentence
+      "pattern": string,       // placeholders + "+" only
+      "rule": string,          // short plain-English
+      "examples": [
+        { "sentence": string, "translation": string },
+        { "sentence": string, "translation": string }
+      ]
+    }
+  ]
+}
 
-Optional (OMIT if not needed):
-- correction
-- structures
-- additional_notes
+Tokenization rules:
+1) 成语 / fixed expressions / compound words = ONE token.
+2) Particles (的, 了, 吗, etc.) are separate tokens.
+3) Do not invent tokens that are not present in the input.
 
-CORRECTION:
-Include ONLY if the sentence is grammatically incorrect or clearly unnatural.
+Structures rules (0–3 only):
+- Include only real, reusable grammar structures.
+- highlight must be exact text from the sentence.
+- pattern must use ONLY Chinese text and placeholders connected by "+".
+- examples must be EXACTLY 2 items.
 
-STRUCTURES:
-- Include 0–3 reusable sentence structures only if they are genuinely useful for learners.
-When explaining grammar structures, use a formal pattern only:
-- Only use this for sentence structures, not just any phrase
-- Must follow this structure: a string of characters and Symbolic placeholders (Subj., Obj., Verb, Time, etc.) connected by plus signs (+)
-- Ensure that the highlight attribute contains the text from the sentence inputted that represents the structure
-
-Each structure must include:
-- title
-- highlight (exact text from the sentence)
-- rule (plain English, concise)
-- examples (EXACTLY 2 items, each with sentence + translation)
-
-ADDITIONAL NOTES:
-- Include ONLY if there are important points not already covered by structures or correction.
-- Omit if empty or unnecessary.
-
-NOW ANALYZE THIS SENTENCE:
-${sentence}
-`;
+Now analyze this sentence:
+${sentence}`;
 }
