@@ -54,7 +54,7 @@ Planned features and improvements:
 
 ### 1. Clone the repository
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/vnt1c/mandarin-lab.git
 cd mandarin-lab
 ```
 
