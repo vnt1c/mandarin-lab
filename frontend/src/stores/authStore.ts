@@ -1,50 +1,51 @@
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
-import type { User } from '@shared';
-import * as authService from '@/services/authService';
+import { create } from "zustand";
+import type { User } from "@supabase/supabase-js";
+import { supabase } from "@/lib/supabaseClient";
 
-interface AuthState {
+type AuthState = {
   user: User | null;
+  initialized: boolean;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<void>;
-  register: (email: string, password: string) => Promise<void>;
-  logout: () => void;
-}
+  error: string | null;
 
-export const useAuthStore = create<AuthState>()(
-  persist(
-    (set) => ({
-      user: null,
-      isLoading: false,
+  init: () => Promise<() => void>;
+  loginWithGoogle: () => Promise<void>;
+  logout: () => Promise<void>;
+};
 
-      login: async (email: string, password: string) => {
-        set({ isLoading: true });
-        try {
-          const user = await authService.fakeLogin(email, password);
-          set({ user, isLoading: false });
-        } catch (error) {
-          set({ isLoading: false });
-          throw error;
-        }
-      },
+export const useAuthStore = create<AuthState>((set) => ({
+  user: null,
+  initialized: false,
+  isLoading: false,
+  error: null,
 
-      register: async (email: string, password: string) => {
-        set({ isLoading: true });
-        try {
-          const user = await authService.fakeRegister(email, password);
-          set({ user, isLoading: false });
-        } catch (error) {
-          set({ isLoading: false });
-          throw error;
-        }
-      },
+  init: async () => {
+    const { data, error } = await supabase.auth.getSession();
+    if (error) set({ error: error.message });
+    set({ user: data.session?.user ?? null, initialized: true });
 
-      logout: () => {
-        set({ user: null });
-      },
-    }),
-    {
-      name: 'auth-storage',
-    }
-  )
-);
+    const { data: sub } = supabase.auth.onAuthStateChange((_evt, session) => {
+      set({ user: session?.user ?? null, initialized: true });
+    });
+
+    return () => sub.subscription.unsubscribe();
+  },
+
+  loginWithGoogle: async () => {
+    set({ isLoading: true, error: null });
+
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo: `${window.location.origin}/auth/callback` },
+    });
+
+    if (error) set({ error: error.message, isLoading: false });
+  },
+
+  logout: async () => {
+    set({ isLoading: true, error: null });
+    const { error } = await supabase.auth.signOut();
+    if (error) set({ error: error.message, isLoading: false });
+    else set({ user: null, isLoading: false, initialized: true });
+  },
+}));

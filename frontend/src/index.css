@@ -136,3 +136,75 @@ All colors MUST be HSL.
     @apply transition-all duration-300 ease-in-out;
   }
 }
+
+@keyframes hl-wipe {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+
+.hl-sweep {
+  position: relative;
+  display: inline-block;
+  font-weight: 600;
+  color: #18181b;
+  border-radius: 0.25rem;
+  /* keep text above the wipe */
+  z-index: 0;
+}
+
+.hl-sweep::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: #fef08a; /* your yellow */
+  border-radius: 0.25rem;
+  transform-origin: left center;
+  transform: scaleX(0);
+  animation: hl-wipe 360ms ease-out forwards;
+  z-index: -1; /* behind text */
+  box-shadow: 0 0 0 1px #fef08a;
+}
+
+/* Collapsible container */
+.collapse {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 260ms ease;
+}
+
+/* Open state */
+.collapse-open {
+  grid-template-rows: 1fr;
+}
+
+/* Closed state: fully non-interactive + visually hidden */
+.collapse-closed {
+  grid-template-rows: 0fr;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+/* Inner wrapper must clip during transition */
+.collapse > .collapse-inner {
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* When open, show content */
+.collapse-open {
+  pointer-events: auto;
+  visibility: visible;
+}
+
+/* Optional: fade/slide only when opening */
+@keyframes collapse-in {
+  from { opacity: 0; transform: translateX(-6px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.collapse-open .collapse-content {
+  animation: collapse-in 220ms ease-out both;
+}
+
+.hl-sweep { z-index: 0; }
+

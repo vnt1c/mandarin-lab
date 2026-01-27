@@ -38,7 +38,7 @@ export default function Dictionary() {
             </p>
           </div>
 
-          <DictionarySearch onSearch={handleSearch} isLoading={isLoading} />
+          <DictionarySearch onSearch={handleSearch} isLoading={true} />
 
           {isLoading && (
             <div className="flex items-center justify-center py-12">
@@ -64,13 +64,14 @@ export default function Dictionary() {
           )}
 
           {!isLoading && !hasSearched && (
-            <div className="glass-strong rounded-2xl p-12 text-center mt-8">
-              <p className="text-muted-foreground">
+            <div className="glass-strong rounded-2xl p-12 text-center mt-8 flex flex-col items-center justify-center gap-4">
+              <p className="text-lg font-medium text-muted-foreground mb-2">Feature not yet added</p>
+              {/* <p className="text-muted-foreground">
                 Search for a word to get started
               </p>
               <p className="text-sm text-muted-foreground mt-2">
                 Try: 学习, 中文, 天气, or 爱
-              </p>
+              </p> */}
             </div>
           )}
         </div>

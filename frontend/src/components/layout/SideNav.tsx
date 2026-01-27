@@ -1,4 +1,4 @@
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useAuthStore } from '@/stores/authStore';
 import { 
@@ -14,11 +14,11 @@ const navItems = [
   { path: '/breakdown', label: 'Sentence breakdown', icon: BookText },
   { path: '/dictionary', label: 'Dictionary', icon: BookOpen },
   { path: '/saved', label: 'Saved sentences', icon: Bookmark },
-  { path: '/tutor', label: 'Tutor', icon: MessageCircle },
 ];
 
 export const SideNav = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const logout = useAuthStore((state) => state.logout);
 
   return (
@@ -57,7 +57,10 @@ export const SideNav = () => {
       <div className="p-4 border-t">
         <Button
           variant="ghost"
-          onClick={logout}
+          onClick={() => {
+            logout();
+            navigate('/');
+          }}
           className="w-full justify-start gap-3"
         >
           <LogOut className="h-4 w-4" />

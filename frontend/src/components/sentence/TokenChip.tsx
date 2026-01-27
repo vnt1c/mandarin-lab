@@ -20,6 +20,35 @@ interface TokenChipProps {
   onSelect?: () => void;
 }
 
+// Map full part of speech names to abbreviations
+const roleAbbreviations: Record<string, string> = {
+  pronoun: 'pron',
+  preposition: 'prep',
+  conjunction: 'conj',
+  particle: 'part',
+  adjective: 'adj',
+  adverb: 'adv',
+  verb: 'verb',
+  noun: 'noun',
+  numeral: 'num',
+  classifier: 'clas',
+  interjection: 'interj',
+  onomatopoeia: 'ono',
+  idiom: 'idiom',
+  expression: 'expr',
+  phrase: 'phrase',
+  suffix: 'suf',
+  prefix: 'pref',
+  properNoun: 'pn',
+  // Add more as needed
+};
+
+function getRoleAbbreviation(role?: string) {
+  if (!role) return '';
+  // Try direct match, then lowercase match
+  return roleAbbreviations[role] || roleAbbreviations[role.toLowerCase()] || role;
+}
+
 export const TokenChip = ({ token, isSelected, onSelect }: TokenChipProps) => {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -52,20 +81,14 @@ export const TokenChip = ({ token, isSelected, onSelect }: TokenChipProps) => {
                   <span className="text-2xl font-serif">{token.text}</span>
                   <span className="text-xs text-muted-foreground">{token.pinyin}</span>
                   <span className="text-xs px-2 py-0.5 rounded-full bg-secondary/30 text-secondary-foreground">
-                    {token.role}
+                    {getRoleAbbreviation(token.role)}
                   </span>
                 </div>
               </TooltipTrigger>
-              <TooltipContent className="max-w-xs">
-                <p className="font-medium">{token.english}</p>
-                <p className="text-xs text-muted-foreground mt-2">
-                  Click to pin details below
-                </p>
-              </TooltipContent>
             </Tooltip>
 
             <CollapsibleContent className="text-xs text-center mt-2 text-muted-foreground">
-              {token.role}
+              {getRoleAbbreviation(token.role)}
             </CollapsibleContent>
           </div>
         </div>

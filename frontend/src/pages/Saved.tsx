@@ -1,15 +1,30 @@
-import { useNavigate } from 'react-router-dom';
-import { SideNav } from '@/components/layout/SideNav';
 import { SavedList } from '@/components/saved/SavedList';
+import { SideNav } from '@/components/layout/SideNav';
 import { useAppStore } from '@/stores/appStore';
-import type { SentenceAnalysis } from '@shared';
+import { useNavigate } from 'react-router-dom';
+import { SavedAnalysis } from '@shared';
+
+import { toast } from '@/hooks/use-toast';
 
 export default function Saved() {
   const navigate = useNavigate();
   const setCurrentAnalysis = useAppStore((state) => state.setCurrentAnalysis);
 
-  const handleReanalyze = (analysis: SentenceAnalysis) => {
-    setCurrentAnalysis(analysis);
+  const handleReanalyze = (item: SavedAnalysis) => {
+    if (!item.analysis || !item.analysis.tokens) {
+      toast({
+        title: "Cannot re-analyze",
+        description: "This saved item is missing analysis data.",
+        variant: "destructive",
+      });
+      return;
+    }
+    setCurrentAnalysis({
+      ...item.analysis,
+      sentence: item.sentence,
+      translation: item.translation,
+      tokens: item.analysis.tokens,
+    });
     navigate('/breakdown');
   };
 

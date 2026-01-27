@@ -1,10 +1,13 @@
-import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { BookOpen } from 'lucide-react';
-import { useAuthStore } from '@/stores/authStore';
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { BookOpen } from "lucide-react";
+import { useAuthStore } from "@/stores/authStore";
+import { useUIStore } from "@/stores/uiStore";
 
 export const TopNav = () => {
-  const { user, logout } = useAuthStore();
+  const user = useAuthStore((s) => s.user);
+  const logout = useAuthStore((s) => s.logout);
+  const openAuth = useUIStore((s) => s.openAuth);
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 glass border-b">
@@ -16,21 +19,26 @@ export const TopNav = () => {
           </Link>
 
           <div className="hidden md:flex items-center gap-8">
-            <Link to="/" className="text-sm font-medium hover:text-primary transition-smooth">
+            <Link
+              to="/"
+              className="text-sm font-medium hover:text-primary transition-smooth"
+            >
               Home
             </Link>
-            <Link to="/services" className="text-sm font-medium hover:text-primary transition-smooth">
+            <Link
+              to="/services"
+              className="text-sm font-medium hover:text-primary transition-smooth"
+            >
               Services
             </Link>
-            <Link to="/pricing" className="text-sm font-medium hover:text-primary transition-smooth">
-              Pricing
-            </Link>
-            <Link to="/about" className="text-sm font-medium hover:text-primary transition-smooth">
+
+            <Link
+              to="/about"
+              className="text-sm font-medium hover:text-primary transition-smooth"
+            >
               About us
             </Link>
-            <Link to="/contact" className="text-sm font-medium hover:text-primary transition-smooth">
-              Contact us
-            </Link>
+
           </div>
 
           <div className="flex items-center gap-3">
@@ -39,18 +47,13 @@ export const TopNav = () => {
                 Logout
               </Button>
             ) : (
-              <>
-                <Link to="/auth">
-                  <Button variant="ghost" size="sm">
-                    Login
-                  </Button>
-                </Link>
-                <Link to="/auth">
-                  <Button size="sm">
-                    Sign Up
-                  </Button>
-                </Link>
-              </>
+              <Button
+                className="rounded-full bg-primary text-primary-foreground shadow-lg px-8 py-3 text-lg font-semibold hover:bg-primary/90 transition-all border-0"
+                size="lg"
+                onClick={openAuth}
+              >
+                Get Started
+              </Button>
             )}
           </div>
         </div>

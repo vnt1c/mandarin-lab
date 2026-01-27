@@ -1,17 +1,34 @@
-import { useMemo, useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { TokenChip } from './TokenChip';
-import type { SentenceAnalysis, Token } from '@shared';
-import { Copy, Share2, Bookmark } from 'lucide-react';
-import { toast } from '@/hooks/use-toast';
-import { saveSentence } from '@/services/storageService';
+import { useEffect, useMemo, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { TokenChip } from "./TokenChip";
+import type { SentenceAnalysis, SavedAnalysis } from "@shared";
+import { Copy, Share2, Bookmark } from "lucide-react";
+import { toast } from "@/hooks/use-toast";
+import { fetchSaved, saveSaved, deleteSaved } from "@/services/savedApi";
 
 interface BreakdownPanelProps {
   analysis: SentenceAnalysis;
 }
 
 export const BreakdownPanel = ({ analysis }: BreakdownPanelProps) => {
-  const [selectedTokenIdx, setSelectedTokenIdx] = useState<number | null>(null);
+  const [selectedTokenIdx, setSelectedTokenIdx] = useState<number | null>(
+    analysis.tokens && analysis.tokens.length > 0 ? 0 : null
+  );
+
+  const [savedId, setSavedId] = useState<string | null>(null);
+  const isSaved = savedId !== null;
+
+  // Check if this sentence is already saved
+  useEffect(() => {
+    fetchSaved()
+      .then((items: SavedAnalysis[]) => {
+        const hit = items.find((x) => x.sentence === analysis.sentence);
+        setSavedId(hit ? hit.id : null);
+      })
+      .catch(() => {
+        setSavedId(null);
+      });
+  }, [analysis.sentence]);
 
   const selectedToken = useMemo(() => {
     if (selectedTokenIdx === null) return null;
@@ -19,20 +36,33 @@ export const BreakdownPanel = ({ analysis }: BreakdownPanelProps) => {
   }, [analysis.tokens, selectedTokenIdx]);
 
   const handleCopyPinyin = () => {
-    const pinyin = analysis.tokens.map((t) => t.pinyin).join(' ');
+    const pinyin = analysis.tokens.map((t) => t.pinyin).join(" ");
     navigator.clipboard.writeText(pinyin);
-    toast({ title: 'Pinyin copied to clipboard' });
+    toast({ title: "Pinyin copied to clipboard" });
   };
 
   const handleShare = () => {
-    const text = `${analysis.sentence}\n${analysis.tokens.map((t) => t.pinyin).join(' ')}`;
+    const text = `${analysis.sentence}\n${analysis.tokens
+      .map((t) => t.pinyin)
+      .join(" ")}`;
     navigator.clipboard.writeText(text);
-    toast({ title: 'Sentence copied to clipboard' });
+    toast({ title: "Sentence copied to clipboard" });
   };
 
-  const handleSave = () => {
-    saveSentence(analysis);
-    toast({ title: 'Sentence saved successfully' });
+  const handleToggleSave = async () => {
+    try {
+      if (savedId) {
+        await deleteSaved(savedId);
+        setSavedId(null);
+        toast({ title: "Sentence removed from saved list" });
+      } else {
+        const item = await saveSaved(analysis);
+        setSavedId(item.id);
+        toast({ title: "Sentence saved successfully" });
+      }
+    } catch {
+      toast({ title: "Save failed", variant: "destructive" });
+    }
   };
 
   return (
@@ -49,14 +79,21 @@ export const BreakdownPanel = ({ analysis }: BreakdownPanelProps) => {
               <Share2 className="h-4 w-4 mr-2" />
               Share
             </Button>
-            <Button variant="default" size="sm" onClick={handleSave}>
-              <Bookmark className="h-4 w-4 mr-2" />
-              Save
+            <Button
+              variant={isSaved ? "secondary" : "default"}
+              size="sm"
+              onClick={handleToggleSave}
+            >
+              <Bookmark
+                className={"h-4 w-4 mr-2" + (isSaved ? " fill-current" : "")}
+                fill={isSaved ? "currentColor" : "none"}
+              />
+              {isSaved ? "Saved" : "Save"}
             </Button>
           </div>
         </div>
 
-        <div className="flex flex-wrap gap-4 mb-6">
+        <div className="flex flex-wrap gap-2 mb-2">
           {analysis.tokens.map((token, idx) => (
             <TokenChip
               key={idx}
@@ -67,36 +104,83 @@ export const BreakdownPanel = ({ analysis }: BreakdownPanelProps) => {
           ))}
         </div>
 
-        {/* Token Definition Panel (replaces Grammar Notes) */}
-        <div className="mt-6 pt-6 border-t">
-          <h3 className="text-sm font-semibold mb-3 text-muted-foreground uppercase tracking-wide">
-            Word Details
-          </h3>
-
+        <div className="pt-6">
           {!selectedToken && (
             <p className="text-sm text-muted-foreground">
-              Click a token above to see its definition.
+              Click a word above to see its definition.
             </p>
           )}
 
           {selectedToken && (
             <div className="rounded-xl border bg-background/40 p-4 space-y-2">
               <div className="flex items-baseline justify-between gap-4">
-                <div className="flex items-baseline gap-3">
-                  <div className="text-3xl font-serif">{selectedToken.text}</div>
-                  <div className="text-sm text-muted-foreground">{selectedToken.pinyin}</div>
-                  <div className="text-xs px-2 py-0.5 rounded-full bg-secondary/30 text-secondary-foreground">
+                <div className="flex items-baseline gap-4">
+                  <div className="text-2xl font-serif">{selectedToken.text}</div>
+                  <div className="text-base text-muted-foreground">
+                    {selectedToken.pinyin}
+                  </div>
+                  <div className="text-sm px-2 py-0.5 rounded-full bg-secondary/30 text-secondary-foreground font-semibold">
                     {selectedToken.role}
                   </div>
+
+                  {selectedToken.formality && (
+                    <span
+                      className={
+                        "text-sm px-2 py-0.5 rounded-full font-semibold " +
+                        (selectedToken.formality === "formal"
+                          ? "bg-blue-100 text-blue-800"
+                          : selectedToken.formality === "informal"
+                          ? "bg-green-100 text-green-800"
+                          : selectedToken.formality === "very_informal"
+                          ? "bg-yellow-100 text-yellow-800"
+                          : "bg-gray-200 text-gray-800")
+                      }
+                    >
+                      {selectedToken.formality
+                        .replace("_", " ")
+                        .replace(/\b\w/g, (l) => l.toUpperCase())}
+                    </span>
+                  )}
+
+                  {selectedToken.usage_tags &&
+                    selectedToken.usage_tags.length > 0 &&
+                    selectedToken.usage_tags.map((tag, idx) => (
+                      <span
+                        key={tag + idx}
+                        className={
+                          "text-sm px-2 py-0.5 rounded-full font-semibold " +
+                          (tag === "slang"
+                            ? "bg-yellow-100 text-yellow-800"
+                            : tag === "vulgar"
+                            ? "bg-rose-100 text-rose-800"
+                            : tag === "derogatory"
+                            ? "bg-pink-100 text-pink-800"
+                            : tag === "offensive"
+                            ? "bg-orange-100 text-orange-800"
+                            : tag === "archaic"
+                            ? "bg-sky-100 text-sky-800"
+                            : "bg-gray-200 text-gray-800")
+                        }
+                      >
+                        {tag.charAt(0).toUpperCase() + tag.slice(1)}
+                      </span>
+                    ))}
                 </div>
               </div>
 
-              {/* "Definition" – use whatever fields you already have */}
-              <div className="text-sm">
-                <div className="font-medium">Definition</div>
-                <div className="text-muted-foreground">
-                  {selectedToken.english || 'No definition available.'}
+              <div className="text-base mt-2">
+                <div className="font-semibold">Definition</div>
+                <div className="text-muted-foreground text-base">
+                  {selectedToken.english || "No definition available."}
                 </div>
+
+                {selectedToken.role_in_sentence && (
+                  <ul className="list-disc ml-5 mt-3">
+                    <li className="text-muted-foreground text-sm">
+                      {selectedToken.role_in_sentence}
+                    </li>
+                  </ul>
+                )}
               </div>
             </div>
           )}
