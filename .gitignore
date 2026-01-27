@@ -36,9 +36,9 @@ out/
 # =====================
 # Env files (secrets)
 # =====================
-.env
-.env.*
-!.env.example
+**/.env
+**/.env.*
+!**/.env.example
 
 # =====================
 # Logs
