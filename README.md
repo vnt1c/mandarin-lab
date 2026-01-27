@@ -5,7 +5,7 @@ Mandarin Lab is a Chinese learning web app that creates smart, structured senten
 ## Features
 
 ### Current
-- Sentence analysis (AI-powered)
+- Sentence analysis
 - Token-by-token sentence breakdown (role, pinyin, meaning, notes)
 - Saved sentences for review
 
