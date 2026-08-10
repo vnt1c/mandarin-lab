@@ -1,0 +1,16 @@
+{
+  "name": "@mandarin-lab/shared",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Types and zod schemas shared by the backend and frontend.",
+  "main": "./index.ts",
+  "types": "./index.ts",
+  "exports": {
+    ".": "./index.ts",
+    "./schemas": "./schemas/index.ts"
+  },
+  "dependencies": {
+    "zod": "^4.3.5"
+  }
+}

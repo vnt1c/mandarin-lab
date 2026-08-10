@@ -21,12 +21,11 @@
     "noImplicitAny": false,
     "noFallthroughCasesInSwitch": false,
 
-    "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
-      "@shared": ["../shared"],
+      "@shared": ["../shared/index.ts"],
       "@shared/*": ["../shared/*"]
     }
   },
-  "include": ["src"]
+  "include": ["src", "../shared"]
 }

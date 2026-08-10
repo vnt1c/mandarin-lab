@@ -13,6 +13,7 @@ Output JSON shape:
 {
   "sentence": string,
   "translation": string,
+  "example_context": string,   // realistic situations where this sentence is naturally used
   "tokens": [
     {
       "text": string,
@@ -29,12 +30,11 @@ Output JSON shape:
   ],
 
   // OPTIONAL (omit if not needed)
-  "correction"?: { "sentence": string, "notes": string },
+  "correction"?: { "message": string, "corrected_sentence": string },
   "structures"?: [
     {
       "title": string,
       "highlight": string,     // exact substring from the input sentence
-      "pattern": string,       // placeholders + "+" only
       "rule": string,          // short plain-English
       "examples": [
         { "sentence": string, "translation": string },
@@ -52,7 +52,6 @@ Tokenization rules:
 Structures rules (0–3 only):
 - Include only real, reusable grammar structures.
 - highlight must be exact text from the sentence.
-- pattern must use ONLY Chinese text and placeholders connected by "+".
 - examples must be EXACTLY 2 items.
 
 Now analyze this sentence:

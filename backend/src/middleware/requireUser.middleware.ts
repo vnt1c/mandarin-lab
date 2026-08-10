@@ -2,7 +2,7 @@
 import type { Request, Response, NextFunction } from "express";
 import { createClient } from "@supabase/supabase-js";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { env } from "../config/env";
+import { env } from "@/config/env";
 
 export type AuthedRequest = Request & {
   user: { id: string };

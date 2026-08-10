@@ -1,4 +1,4 @@
-import { env, isProd } from "./config/env";
+import { env, isProd } from "@/config/env";
 
 import express, { type Express, Request, Response } from "express";
 import cors from "cors";
@@ -6,10 +6,10 @@ import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 import morgan from "morgan";
 
-import analysisRoutes from "./routes/analysis.routes";
-import { errorMiddleware } from "./middleware/error.middleware";
-import { requestId } from "./middleware/requestId.middleware";
-import savedRoutes from "./routes/saved.routes";
+import analysisRoutes from "@/routes/analysis.routes";
+import { errorMiddleware } from "@/middleware/error.middleware";
+import { requestId } from "@/middleware/requestId.middleware";
+import savedRoutes from "@/routes/saved.routes";
 
 
 const PORT: number = env.PORT;

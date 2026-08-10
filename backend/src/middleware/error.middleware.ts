@@ -1,6 +1,6 @@
 import type { Request, Response, NextFunction } from "express";
-import { HttpError } from "../lib/HttpError";
-import { isProd } from "../config/env";
+import { HttpError } from "@/lib/HttpError";
+import { isProd } from "@/config/env";
 
 export function errorMiddleware(
   err: unknown,

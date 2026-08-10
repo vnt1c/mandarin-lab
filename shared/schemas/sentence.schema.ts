@@ -1,21 +1,32 @@
 import { z } from "zod";
 
 /**
+ * The single source of truth for the sentence-analysis contract.
+ *
+ * This schema is used in three places and must not be mirrored by hand:
+ *  - the backend feeds it to Gemini as `responseJsonSchema` to constrain generation
+ *  - the backend re-validates the model output with `safeParse`
+ *  - `shared/types/sentence.ts` derives the frontend's TypeScript types via `z.infer`
+ *
+ * Changing a field here propagates to the API, the validation, and the frontend
+ * types at once. Keep `chineseSentenceAnalysis.prompt.ts` in step with it.
+ */
+
+/**
  * Enums
  */
-const formalityEnum = z
+export const formalityEnum = z
   .enum(["formal", "informal", "very_informal"])
   .describe("Register/formality level (optional)");
 
 /**
  * Token-only usage tags (optional)
  */
-const usageTagEnum = z
+export const usageTagEnum = z
   .enum(["slang", "vulgar", "derogatory", "offensive", "archaic"])
   .describe("Token usage tag (optional)");
 
-// Keep your POS/role enum as-is
-const roleEnum = z
+export const roleEnum = z
   .enum([
     "noun",
     "pronoun",
@@ -41,7 +52,7 @@ const roleEnum = z
  * - formality is OPTIONAL ("formal" | "informal" | "very_informal")
  * - usage_tags is OPTIONAL and TOKEN-ONLY
  */
-const tokenSchema = z.object({
+export const tokenSchema = z.object({
   text: z.string().describe(
     "Chinese text of this token (may be multi-character for idioms/compounds)"
   ),
@@ -76,7 +87,7 @@ const tokenSchema = z.object({
 /**
  * Corrections / Suggestions (omit if none)
  */
-const correctionSchema = z.object({
+export const correctionSchema = z.object({
   message: z.string().describe(
     "Short explanation of what to change and why"
   ),
@@ -86,10 +97,15 @@ const correctionSchema = z.object({
   ),
 });
 
+export const structureExampleSchema = z.object({
+  sentence: z.string().describe("Example Chinese sentence"),
+  translation: z.string().describe("English translation of example"),
+});
+
 /**
  * Sentence structures (0–3)
  */
-const structureSchema = z.object({
+export const structureSchema = z.object({
   title: z.string().describe(
     "Short name, e.g. 'Verb + 不 + Verb / Adj. + 不 + Adj.' or '向 + Direction / Person + Verb'"
   ),
@@ -102,12 +118,7 @@ const structureSchema = z.object({
     "Plain-English rule that explains how to use this sentence structure"
   ),
 
-  examples: z.array(
-    z.object({
-      sentence: z.string().describe("Example Chinese sentence"),
-      translation: z.string().describe("English translation of example"),
-    })
-  ).length(2).describe("Exactly 2 examples"),
+  examples: z.array(structureExampleSchema).length(2).describe("Exactly 2 examples"),
 });
 
 /**
@@ -138,5 +149,3 @@ export const sentenceAnalysisSchema = z.object({
     "Tokens in order of appearance"
   ),
 });
-
-export type SentenceAnalysis = z.infer<typeof sentenceAnalysisSchema>;

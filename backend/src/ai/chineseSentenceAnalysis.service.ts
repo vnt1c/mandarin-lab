@@ -1,7 +1,7 @@
-import { gemini } from "./geminiClient";
-import { buildSentenceAnalysisPrompt } from "./chineseSentenceAnalysis.prompt";
-import { sentenceAnalysisSchema } from "./chineseSentenceAnalysis.schema";
-import { HttpError } from "../lib/HttpError";
+import { gemini } from "@/ai/geminiClient";
+import { buildSentenceAnalysisPrompt } from "@/ai/chineseSentenceAnalysis.prompt";
+import { sentenceAnalysisSchema } from "@shared/schemas";
+import { HttpError } from "@/lib/HttpError";
 import { z } from "zod";
 
 export async function analyzeChineseSentence(sentence: string) {

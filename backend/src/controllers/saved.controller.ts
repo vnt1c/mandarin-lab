@@ -1,6 +1,6 @@
 // src/controllers/saved.controller.ts
 import type { Response } from "express";
-import type { AuthedRequest } from "../middleware/requireUser.middleware";
+import type { AuthedRequest } from "@/middleware/requireUser.middleware";
 
 export async function saveAnalysis(req: AuthedRequest, res: Response) {
   const { sentence, translation, analysis } = req.body;

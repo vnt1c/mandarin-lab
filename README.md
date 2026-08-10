@@ -42,6 +42,22 @@ Planned features and improvements:
 - Database & Auth: Supabase (PostgreSQL + Google OAuth)
 - AI: Google Gemini
 
+## Project layout
+
+```
+shared/    types and zod schemas used by both sides
+backend/   Express API (Gemini + Supabase)
+frontend/  React app
+```
+
+`shared/schemas/sentence.schema.ts` is the single source of truth for the
+sentence-analysis contract. The backend feeds it to Gemini as a response
+schema and validates replies against it; the frontend's types in
+`shared/types/` are derived from it with `z.infer`, so the two cannot drift.
+
+Both workspaces use `@/` for their own source and `@shared` for the shared
+package.
+
 ## Development and Running Locally
 
 ### Prerequisites
@@ -59,13 +75,11 @@ cd mandarin-lab
 ```
 
 ### 2. Install dependencies
-```bash
-# Backend
-cd backend
-npm install
 
-# Frontend
-cd ../frontend
+This is an npm workspace, so install once from the repository root — it covers
+`shared`, `backend`, and `frontend` together.
+
+```bash
 npm install
 ```
 
@@ -101,19 +115,17 @@ VITE_SUPABASE_ANON_KEY=
 
 ### 5. Run the application
 
-Start the backend server
-```bash
-cd backend
-npm run dev
-```
+From the repository root, in two terminals:
 
-Start the frontend development server
 ```bash
-cd frontend
-npm run dev
+npm run dev:backend
+npm run dev:frontend
 ```
 
 Open `http://localhost:5173` in your browser.
+
+Other root scripts: `npm run typecheck` and `npm run build` run across both
+workspaces.
 
 ## Notes
 
