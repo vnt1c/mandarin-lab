@@ -21,8 +21,6 @@ export default defineConfig({
       "zustand",
       "clsx",
       "tailwind-merge",
-      // if you use them immediately in dev:
-      "recharts",
       "lucide-react",
     ],
   },
