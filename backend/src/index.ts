@@ -12,8 +12,6 @@ import { requestId } from "@/middleware/requestId.middleware";
 import savedRoutes from "@/routes/saved.routes";
 
 
-const PORT: number = env.PORT;
-
 const app: Express = express();
 
 if (isProd) {
@@ -32,7 +30,7 @@ app.use(
       : ":method :url :status :response-time ms req=:req-id",
     {
       stream: {
-        write: (msg) => console.log(msg.trim()),
+        write: (msg: string) => console.log(msg.trim()),
       },
     }
   )

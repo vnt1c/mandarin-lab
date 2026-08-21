@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import type { SentenceAnalysis, SavedAnalysis } from "@shared";
+import type { SavedAnalysis } from "@shared";
 import { fetchSaved, deleteSaved } from "@/services/savedApi";
 import { Button } from "@/components/ui/button";
 import { Trash2, Eye } from "lucide-react";

@@ -1,5 +1,3 @@
-import type { ChatMessage } from '@shared';
-
 const responses: Record<string, string> = {
   hello: 'Hello! This feature is not yet implemented.',
 };

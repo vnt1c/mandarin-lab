@@ -25,7 +25,9 @@
     "zod": "^4.3.5"
   },
   "devDependencies": {
+    "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
+    "@types/morgan": "^1.9.10",
     "@types/node": "^25.0.9",
     "tsc-alias": "^1.9.1",
     "tsx": "^4.21.0",

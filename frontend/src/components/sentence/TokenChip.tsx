@@ -2,16 +2,13 @@ import { useState } from 'react';
 import type { Token } from '@shared';
 import {
   Tooltip,
-  TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import {
   Collapsible,
   CollapsibleContent,
-  CollapsibleTrigger,
 } from '@/components/ui/collapsible';
-import { ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface TokenChipProps {

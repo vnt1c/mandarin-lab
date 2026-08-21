@@ -6,6 +6,9 @@
        without the deprecated `baseUrl`. tsx handles it directly in dev; for
        the build, tsc-alias rewrites both (see "tsc-alias" below). */
     "moduleResolution": "bundler",
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "skipLibCheck": true,
