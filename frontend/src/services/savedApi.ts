@@ -1,7 +1,6 @@
 import { supabase } from "@/lib/supabaseClient";
 import type { SentenceAnalysis, SavedAnalysis } from "@shared";
-
-const API_BASE = import.meta.env.VITE_API_BASE_URL;
+import { API_BASE_URL as API_BASE } from "@/lib/config";
 
 async function getToken(): Promise<string> {
   const { data, error } = await supabase.auth.getSession();

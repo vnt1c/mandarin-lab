@@ -1,5 +1,4 @@
 import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
@@ -13,9 +12,7 @@ import { X, MessageCircle } from "lucide-react";
 import { useState, useEffect } from "react";
 import { TutorChat } from "@/components/tutor/TutorChat";
 import Services from "./pages/Services";
-import Pricing from "./pages/Pricing";
 import About from "./pages/About";
-import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 import { Button } from "@/components/ui/button";
 import heroImage from "@/assets/hero-watercolor.jpg";
@@ -67,7 +64,6 @@ const App = () => {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <Toaster />
-        <Sonner />
         <BrowserRouter>
           {/* Single global auth modal mount */}
           <AuthModal open={authOpen} onOpenChange={setAuthOpen} />

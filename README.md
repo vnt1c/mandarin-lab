@@ -88,7 +88,7 @@ npm install
 Backend (`/backend/.env`)
 ```env
 NODE_ENV=development
-PORT=4000
+PORT=3000
 
 GEMINI_API_KEY=
 
@@ -100,7 +100,7 @@ FRONTEND_ORIGIN=http://localhost:5173
 
 Frontend (`/frontend/.env`)
 ```env
-VITE_API_BASE_URL=http://localhost:4000
+VITE_API_BASE_URL=http://localhost:3000
 
 VITE_SUPABASE_URL=
 VITE_SUPABASE_ANON_KEY=
