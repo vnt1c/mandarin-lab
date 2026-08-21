@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import type { ChatMessage } from '@shared';
-import { generateTutorResponse } from '@/services/tutorService';
+import { generateTutorResponse } from '@/mocks/tutor';
 import { Send } from 'lucide-react';
 
 export const TutorChat = () => {

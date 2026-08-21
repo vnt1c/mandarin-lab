@@ -15,10 +15,7 @@ export const SavedList = ({ onReanalyze }: SavedListProps) => {
 
   useEffect(() => {
     fetchSaved()
-      .then((items) => {
-        console.log('Fetched saved items:', items);
-        setSaved(items);
-      })
+      .then(setSaved)
       .catch(() =>
         toast({ title: "Failed to load saved sentences", variant: "destructive" })
       )

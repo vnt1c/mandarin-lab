@@ -5,6 +5,7 @@ import type { SentenceAnalysis, SavedAnalysis } from "@shared";
 import { Copy, Share2, Bookmark } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { fetchSaved, saveSaved, deleteSaved } from "@/services/savedApi";
+import { ApiError } from "@/lib/apiClient";
 
 interface BreakdownPanelProps {
   analysis: SentenceAnalysis;
@@ -60,8 +61,15 @@ export const BreakdownPanel = ({ analysis }: BreakdownPanelProps) => {
         setSavedId(item.id);
         toast({ title: "Sentence saved successfully" });
       }
-    } catch {
-      toast({ title: "Save failed", variant: "destructive" });
+    } catch (error) {
+      toast({
+        title: savedId ? "Delete failed" : "Save failed",
+        description:
+          error instanceof ApiError && error.isClientError
+            ? error.message
+            : undefined,
+        variant: "destructive",
+      });
     }
   };
 

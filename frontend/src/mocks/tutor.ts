@@ -1,3 +1,7 @@
+/**
+ * MOCK. Returns a canned "not implemented" reply for every input — the tutor
+ * has no backend yet. Replace with a real service when the endpoint exists.
+ */
 const responses: Record<string, string> = {
   hello: 'Hello! This feature is not yet implemented.',
 };
