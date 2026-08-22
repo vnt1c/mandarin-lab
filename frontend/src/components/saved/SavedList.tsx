@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
 import type { SavedAnalysis } from "@shared";
-import { fetchSaved, deleteSaved } from "@/services/savedApi";
+import { useSavedList, useDeleteSaved } from "@/hooks/useSaved";
+import { ApiError } from "@/lib/apiClient";
 import { Button } from "@/components/ui/button";
 import { Trash2, Eye } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
@@ -10,26 +10,32 @@ interface SavedListProps {
 }
 
 export const SavedList = ({ onReanalyze }: SavedListProps) => {
-  const [saved, setSaved] = useState<SavedAnalysis[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data: saved = [], isPending: loading, isError } = useSavedList();
+  const deleteSaved = useDeleteSaved();
 
-  useEffect(() => {
-    fetchSaved()
-      .then(setSaved)
-      .catch(() =>
-        toast({ title: "Failed to load saved sentences", variant: "destructive" })
-      )
-      .finally(() => setLoading(false));
-  }, []);
+  if (isError) {
+    return (
+      <div className="glass-strong rounded-2xl p-12 text-center">
+        <p className="text-muted-foreground">
+          Failed to load saved sentences.
+        </p>
+      </div>
+    );
+  }
 
-  const handleDelete = async (id: string) => {
-    try {
-      await deleteSaved(id);
-      setSaved((prev) => prev.filter((x) => x.id !== id));
-      toast({ title: "Sentence removed from saved list" });
-    } catch {
-      toast({ title: "Delete failed", variant: "destructive" });
-    }
+  const handleDelete = (id: string) => {
+    deleteSaved.mutate(id, {
+      onSuccess: () => toast({ title: "Sentence removed from saved list" }),
+      onError: (error) =>
+        toast({
+          title: "Delete failed",
+          description:
+            error instanceof ApiError && error.isClientError
+              ? error.message
+              : undefined,
+          variant: "destructive",
+        }),
+    });
   };
 
   if (loading) {

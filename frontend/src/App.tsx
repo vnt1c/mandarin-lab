@@ -1,6 +1,7 @@
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ApiError } from "@/lib/apiClient";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useAuthStore } from "@/stores/authStore";
 import { SideNav } from "@/components/layout/SideNav";
@@ -37,7 +38,18 @@ const AuthenticatedLayout = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 30_000,
+      // A 4xx means the request itself was wrong; retrying just repeats it.
+      retry: (failureCount, error) =>
+        error instanceof ApiError && error.isClientError
+          ? false
+          : failureCount < 2,
+    },
+  },
+});
 
 const App = () => {
   const user = useAuthStore((state) => state.user);

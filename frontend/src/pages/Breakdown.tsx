@@ -4,8 +4,9 @@ import { SideNav } from "@/components/layout/SideNav";
 import { SentenceInput } from "@/components/sentence/SentenceInput";
 import { BreakdownPanel } from "@/components/sentence/BreakdownPanel";
 import { analyzeSentence } from "@/services/analysisService";
-import { fetchSaved } from "@/services/savedApi";
+import { useSavedList } from "@/hooks/useSaved";
 import { ApiError } from "@/lib/apiClient";
+import { useMutation } from "@tanstack/react-query";
 import { useAppStore } from "@/stores/appStore";
 import { Loader2 } from "lucide-react";
 import { SentencePanel } from "@/components/sentence/SentencePanel";
@@ -13,44 +14,41 @@ import { toast } from "@/hooks/use-toast";
 
 export default function Breakdown() {
   const { currentAnalysis, setCurrentAnalysis } = useAppStore();
-  const [isLoading, setIsLoading] = useState(false);
   const [inputValue, setInputValue] = useState("");
 
-  const handleAnalyze = async (text: string) => {
-    setIsLoading(true);
-    try {
-      // Reuse a previous analysis if this sentence is already saved. Analysis
-      // does not require auth, so a failure here must not block it.
-      const hit = await fetchSaved()
-        .then((saved) => saved.find((s) => s.sentence === text))
-        .catch(() => undefined);
+  const { data: saved = [] } = useSavedList();
 
-      if (hit) {
-        setCurrentAnalysis(hit.analysis);
-        return;
-      }
-
-      const analysis = await analyzeSentence(text);
-      setCurrentAnalysis(analysis);
-    } catch (error) {
+  const analyze = useMutation({
+    mutationFn: analyzeSentence,
+    onSuccess: setCurrentAnalysis,
+    onError: (error) => {
       console.error("Error analyzing sentence:", error);
 
       // The backend validates in validateSentence.ts and returns 400 with a
       // specific reason; anything else is ours to apologise for.
       if (error instanceof ApiError && error.isClientError) {
-        toast({
-          title: "Invalid sentence",
-          description: error.message,
-        });
+        toast({ title: "Invalid sentence", description: error.message });
       } else {
         toast({
           title: "Server Error",
           description: "Please try again later",
         });
       }
-    } finally {
-      setIsLoading(false);
+    },
+  });
+
+  const isLoading = analyze.isPending;
+
+  const handleAnalyze = (text: string) => {
+    // Reuse a previous analysis if this sentence is already saved. The list is
+    // served from the shared cache, so this costs no request.
+    const hit = saved.find((s) => s.sentence === text);
+    if (hit) {
+      setCurrentAnalysis(hit.analysis);
+      return;
     }
+
+    analyze.mutate(text);
   };
 
   return (
