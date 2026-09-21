@@ -43,19 +43,6 @@ All colors MUST be HSL.
 
     --radius: 1rem;
 
-    /* Glass effect */
-    --glass-bg: 0 0% 100% / 0.7;
-    --glass-border: 160 20% 88% / 0.5;
-
-    /* Sidebar */
-    --sidebar-background: 45 40% 98%;
-    --sidebar-foreground: 220 15% 20%;
-    --sidebar-primary: 160 28% 56%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 202 40% 95%;
-    --sidebar-accent-foreground: 220 15% 20%;
-    --sidebar-border: 160 20% 90%;
-    --sidebar-ring: 160 28% 56%;
   }
 
   .dark {
@@ -86,18 +73,6 @@ All colors MUST be HSL.
     --border: 220 15% 20%;
     --input: 220 15% 20%;
     --ring: 160 28% 56%;
-
-    --glass-bg: 220 18% 12% / 0.7;
-    --glass-border: 220 15% 20% / 0.5;
-
-    --sidebar-background: 220 20% 10%;
-    --sidebar-foreground: 45 40% 90%;
-    --sidebar-primary: 160 28% 56%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 220 15% 18%;
-    --sidebar-accent-foreground: 45 40% 90%;
-    --sidebar-border: 220 15% 18%;
-    --sidebar-ring: 160 28% 56%;
   }
 }
 
