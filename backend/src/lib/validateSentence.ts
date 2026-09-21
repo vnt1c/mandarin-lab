@@ -1,6 +1,6 @@
 export type ValidateResult =
   | { ok: true; value: string }
-  | { ok: false; code: string; message: string };
+  | { ok: false; message: string };
 
 const MAX_LEN = 50;
 const MIN_LEN = 1;
@@ -21,7 +21,7 @@ const REPEAT_ASCII_PUNCT_RE = /([.!?,])\1{3,}/u;     // 4+ same ASCII punct
 
 export function validateChineseSentence(raw: unknown): ValidateResult {
   if (typeof raw !== "string") {
-    return { ok: false, code: "type", message: "sentence must be a string" };
+    return { ok: false, message: "sentence must be a string" };
   }
 
   // Step 0: normalize + trim
@@ -31,28 +31,28 @@ export function validateChineseSentence(raw: unknown): ValidateResult {
   s = s.replace(/\s+/g, " ");
 
   if (s.length < MIN_LEN) {
-    return { ok: false, code: "min_length", message: "sentence is empty" };
+    return { ok: false, message: "sentence is empty" };
   }
   if (s.length > MAX_LEN) {
-    return { ok: false, code: "max_length", message: `max length is ${MAX_LEN}` };
+    return { ok: false, message: `max length is ${MAX_LEN}` };
   }
 
   if (DISALLOWED_C_RE.test(s)) {
-    return { ok: false, code: "disallowed_chars", message: "contains invisible/control characters" };
+    return { ok: false, message: "contains invisible/control characters" };
   }
 
   // Step 1: allowlist
   if (!ALLOWED_RE.test(s)) {
-    return { ok: false, code: "charset", message: "contains unsupported characters" };
+    return { ok: false, message: "contains unsupported characters" };
   }
 
   // Step 2: structural sanity
   if (!/\p{Script=Han}/u.test(s)) {
-    return { ok: false, code: "no_han", message: "must contain at least one Chinese character" };
+    return { ok: false, message: "must contain at least one Chinese character" };
   }
 
   if (REPEAT_PUNCT_RE.test(s) || REPEAT_ASCII_PUNCT_RE.test(s)) {
-    return { ok: false, code: "punct_repeat", message: "too much repeated punctuation" };
+    return { ok: false, message: "too much repeated punctuation" };
   }
 
   return { ok: true, value: s };
