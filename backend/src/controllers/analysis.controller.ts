@@ -1,7 +1,7 @@
 import type { Request, Response } from "express";
-import { analyzeChineseSentence } from "../ai";
-import { HttpError } from "../lib/HttpError";
-import { validateChineseSentence } from "../lib/validateSentence";
+import { analyzeChineseSentence } from "@/ai";
+import { HttpError } from "@/lib/HttpError";
+import { validateChineseSentence } from "@/lib/validateSentence";
 
 export async function analyzeSentence(req: Request, res: Response) {
   const v = validateChineseSentence(req.body?.sentence);
@@ -12,14 +12,9 @@ export async function analyzeSentence(req: Request, res: Response) {
 
   const sentence = v.value;
 
-  const geminiResult = await analyzeChineseSentence(sentence);
+  // Already validated against sentenceAnalysisSchema, which strips unknown
+  // keys — so this is exactly the shared SentenceAnalysis shape.
+  const analysis = await analyzeChineseSentence(sentence);
 
-  return res.json({
-    sentence: geminiResult.sentence,
-    translation: geminiResult.translation,
-    example_context: geminiResult.example_context,
-    correction: geminiResult.correction,
-    structures: geminiResult.structures,
-    tokens: geminiResult.tokens,
-});
+  return res.json(analysis);
 }

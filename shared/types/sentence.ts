@@ -1,81 +1,34 @@
-export type TokenFormality = "formal" | "informal" | "very_informal";
+import type { z } from "zod";
+import type {
+  correctionSchema,
+  formalityEnum,
+  roleEnum,
+  sentenceAnalysisSchema,
+  structureExampleSchema,
+  structureSchema,
+  tokenSchema,
+  usageTagEnum,
+} from "../schemas/sentence.schema";
 
-export type TokenUsageTag =
-  | "slang"
-  | "vulgar"
-  | "derogatory"
-  | "offensive"
-  | "archaic";
+/**
+ * Every type below is derived from the zod schema in `shared/schemas`, so the
+ * frontend cannot drift from what the API actually returns. Do not hand-write
+ * shapes here — change the schema instead.
+ *
+ * These are all type-only imports, so nothing pulls zod into the frontend bundle.
+ */
 
-export type TokenRole =
-  | "noun"
-  | "pronoun"
-  | "verb"
-  | "adjective"
-  | "adverb"
-  | "preposition"
-  | "classifier"
-  | "particle"
-  | "conjunction"
-  | "interjection"
-  | "number"
-  | "idiom"
-  | "aspect_marker"
-  | "localizer"
-  | "modifier";
+export type TokenFormality = z.infer<typeof formalityEnum>;
+export type TokenUsageTag = z.infer<typeof usageTagEnum>;
+export type TokenRole = z.infer<typeof roleEnum>;
 
-export interface Token {
-  text: string;
-  pinyin: string;
-  zhuyin: string;
+export type Token = z.infer<typeof tokenSchema>;
+export type Correction = z.infer<typeof correctionSchema>;
+export type SentenceStructureExample = z.infer<typeof structureExampleSchema>;
+export type SentenceStructure = z.infer<typeof structureSchema>;
+export type SentenceAnalysis = z.infer<typeof sentenceAnalysisSchema>;
 
-  role: TokenRole;
-  english: string;
-
-  /** Optional enrichments */
-  role_in_sentence?: string;
-  formality?: TokenFormality;
-  usage_tags: TokenUsageTag[]; // always array, possibly empty
-}
-
-export interface Correction {
-  message: string;
-  corrected_sentence: string;
-}
-
-export interface SentenceStructureExample {
-  sentence: string;
-  translation: string;
-}
-
-export interface SentenceStructure {
-  title: string;
-  highlight: string;
-  rule: string;
-  examples: [
-    SentenceStructureExample,
-    SentenceStructureExample
-  ];
-}
-
-export interface SentenceAnalysis {
-  sentence: string;
-  translation: string;
-
-  example_context: string;
-
-  /** Optional; omitted if none */
-  correction?: Correction;
-
-  /** Always present; empty array if none */
-  structures: SentenceStructure[];
-
-  /** Always present; empty array if none */
-  additional_notes: string[];
-
-  tokens: Token[];
-}
-
+/** A row in the `saved_analyses` table; not part of the AI contract. */
 export interface SavedAnalysis {
   id: string;
   sentence: string;

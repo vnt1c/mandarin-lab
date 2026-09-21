@@ -1,10 +1,11 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { TokenChip } from "./TokenChip";
-import type { SentenceAnalysis, SavedAnalysis } from "@shared";
+import type { SentenceAnalysis } from "@shared";
 import { Copy, Share2, Bookmark } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
-import { fetchSaved, saveSaved, deleteSaved } from "@/services/savedApi";
+import { useSavedList, useSaveAnalysis, useDeleteSaved } from "@/hooks/useSaved";
+import { ApiError } from "@/lib/apiClient";
 
 interface BreakdownPanelProps {
   analysis: SentenceAnalysis;
@@ -15,20 +16,14 @@ export const BreakdownPanel = ({ analysis }: BreakdownPanelProps) => {
     analysis.tokens && analysis.tokens.length > 0 ? 0 : null
   );
 
-  const [savedId, setSavedId] = useState<string | null>(null);
+  // Derived from the shared cache rather than fetched again here.
+  const { data: saved = [] } = useSavedList();
+  const savedId =
+    saved.find((x) => x.sentence === analysis.sentence)?.id ?? null;
   const isSaved = savedId !== null;
 
-  // Check if this sentence is already saved
-  useEffect(() => {
-    fetchSaved()
-      .then((items: SavedAnalysis[]) => {
-        const hit = items.find((x) => x.sentence === analysis.sentence);
-        setSavedId(hit ? hit.id : null);
-      })
-      .catch(() => {
-        setSavedId(null);
-      });
-  }, [analysis.sentence]);
+  const saveAnalysis = useSaveAnalysis();
+  const removeSaved = useDeleteSaved();
 
   const selectedToken = useMemo(() => {
     if (selectedTokenIdx === null) return null;
@@ -49,19 +44,27 @@ export const BreakdownPanel = ({ analysis }: BreakdownPanelProps) => {
     toast({ title: "Sentence copied to clipboard" });
   };
 
-  const handleToggleSave = async () => {
-    try {
-      if (savedId) {
-        await deleteSaved(savedId);
-        setSavedId(null);
-        toast({ title: "Sentence removed from saved list" });
-      } else {
-        const item = await saveSaved(analysis);
-        setSavedId(item.id);
-        toast({ title: "Sentence saved successfully" });
-      }
-    } catch {
-      toast({ title: "Save failed", variant: "destructive" });
+  const handleToggleSave = () => {
+    const onError = (error: unknown) =>
+      toast({
+        title: savedId ? "Delete failed" : "Save failed",
+        description:
+          error instanceof ApiError && error.isClientError
+            ? error.message
+            : undefined,
+        variant: "destructive",
+      });
+
+    if (savedId) {
+      removeSaved.mutate(savedId, {
+        onSuccess: () => toast({ title: "Sentence removed from saved list" }),
+        onError,
+      });
+    } else {
+      saveAnalysis.mutate(analysis, {
+        onSuccess: () => toast({ title: "Sentence saved successfully" }),
+        onError,
+      });
     }
   };
 

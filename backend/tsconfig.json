@@ -1,21 +1,35 @@
 {
-	"compilerOptions": {
-	  "target": "ES2022",
-	  "module": "ES2022",
-	  "moduleResolution": "node",
-	  "esModuleInterop": true,
-	  "allowSyntheticDefaultImports": true,
-	  "skipLibCheck": true,
-	  "forceConsistentCasingInFileNames": true,
-	  "resolveJsonModule": true,
-	  "isolatedModules": true,
-	  "outDir": "./dist",
-	  "rootDir": "./src"
-	},
-	"include": ["src/**/*", "src/ai"],
-	"exclude": ["node_modules"],
-	"ts-node": {
-	  "esm": true,
-	  "experimentalSpecifierResolution": "node"
-	}
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ES2022",
+    /* "bundler" resolution lets us write extensionless imports and `paths`
+       without the deprecated `baseUrl`. tsx handles it directly in dev; for
+       the build, tsc-alias rewrites both (see "tsc-alias" below). */
+    "moduleResolution": "bundler",
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "outDir": "./dist",
+    /* `..` so the shared/ package compiles alongside src/ into dist/. */
+    "rootDir": "..",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@shared": ["../shared/index.ts"],
+      "@shared/*": ["../shared/*"]
+    }
+  },
+  /* tsc type-checks the aliases but emits them verbatim; tsc-alias rewrites
+     them to relative paths and appends the .js extensions Node's ESM loader
+     requires. Both run in `npm run build`. */
+  "tsc-alias": {
+    "resolveFullPaths": true
+  },
+  "include": ["src/**/*", "../shared/**/*"],
+  "exclude": ["node_modules", "dist"]
 }

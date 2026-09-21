@@ -17,12 +17,9 @@ export default defineConfig({
       "react-dom",
       "react-router-dom",
       "@tanstack/react-query",
-      "zod",
       "zustand",
       "clsx",
       "tailwind-merge",
-      // if you use them immediately in dev:
-      "recharts",
       "lucide-react",
     ],
   },

@@ -1,74 +1,35 @@
-import { supabase } from "@/lib/supabaseClient";
 import type { SentenceAnalysis, SavedAnalysis } from "@shared";
+import { api } from "@/lib/apiClient";
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL;
-
-async function getToken(): Promise<string> {
-  const { data, error } = await supabase.auth.getSession();
-  if (error) throw error;
-
-  const token = data.session?.access_token;
-  if (!token) throw new Error("Not authenticated");
-  return token;
-}
+/**
+ * The /api/saved routes wrap their payload in an envelope, unlike /api/analyze
+ * which returns the object directly. Keep the shapes here so the unwrapping is
+ * checked rather than asserted with `as`.
+ */
+type SavedListResponse = { ok: true; rows: SavedAnalysis[] };
+type SavedRowResponse = { ok: true; row: SavedAnalysis };
 
 export async function fetchSaved(): Promise<SavedAnalysis[]> {
-  const token = await getToken();
-
-  const res = await fetch(`${API_BASE}/api/saved`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
+  const { rows } = await api.get<SavedListResponse>("/api/saved", {
+    auth: true,
   });
-
-  if (!res.ok) {
-    throw new Error("Failed to fetch saved sentences");
-  }
-
-  const json = await res.json();
-  return json.rows as SavedAnalysis[];
+  return rows;
 }
 
 export async function saveSaved(
   analysis: SentenceAnalysis
 ): Promise<SavedAnalysis> {
-  const token = await getToken();
-
-  // Wrap the analysis object in the expected structure
-  const payload = {
-    sentence: analysis.sentence,
-    translation: analysis.translation,
-    analysis: analysis,
-  };
-
-  const res = await fetch(`${API_BASE}/api/saved`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
+  const { row } = await api.post<SavedRowResponse>("/api/saved", {
+    auth: true,
+    body: {
+      sentence: analysis.sentence,
+      translation: analysis.translation,
+      analysis,
     },
-    body: JSON.stringify(payload),
   });
-
-  if (!res.ok) {
-    throw new Error("Failed to save sentence");
-  }
-
-  const json = await res.json();
-  return json.row as SavedAnalysis;
+  return row;
 }
 
-export async function deleteSaved(id: string): Promise<void> {
-  const token = await getToken();
-
-  const res = await fetch(`${API_BASE}/api/saved/${id}`, {
-    method: "DELETE",
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-
-  if (!res.ok) {
-    throw new Error("Failed to delete sentence");
-  }
+export function deleteSaved(id: string): Promise<void> {
+  return api.delete<void>(`/api/saved/${id}`, { auth: true });
 }

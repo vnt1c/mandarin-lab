@@ -1,13 +1,24 @@
 // middleware/requireUser.ts
-import type { Request, Response, NextFunction } from "express";
+import type { Request, RequestHandler, Response, NextFunction } from "express";
 import { createClient } from "@supabase/supabase-js";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { env } from "../config/env";
+import { env } from "@/config/env";
 
 export type AuthedRequest = Request & {
   user: { id: string };
-  supabase: SupabaseClient; // <- key change
+  supabase: SupabaseClient;
 };
+
+/**
+ * Adapts a handler that expects an AuthedRequest to Express's RequestHandler.
+ * Only sound behind requireUser, which attaches user/supabase before the
+ * handler runs — register the two together.
+ */
+export function authed(
+  handler: (req: AuthedRequest, res: Response) => Promise<unknown>
+): RequestHandler {
+  return (req, res) => handler(req as AuthedRequest, res);
+}
 
 export async function requireUser(req: Request, res: Response, next: NextFunction) {
   const auth = req.header("authorization") || "";

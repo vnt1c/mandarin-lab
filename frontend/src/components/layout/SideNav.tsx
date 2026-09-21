@@ -4,9 +4,8 @@ import { useAuthStore } from '@/stores/authStore';
 import { 
   BookOpen, 
   BookText, 
-  Bookmark, 
-  MessageCircle, 
-  LogOut 
+  Bookmark,
+  LogOut
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 

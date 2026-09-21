@@ -1,5 +1,10 @@
 import type { DictionaryEntry } from '@shared';
 
+/**
+ * MOCK. Four hardcoded entries with simulated latency — there is no dictionary
+ * backend yet. Replace with a real service when the endpoint exists.
+ */
+
 const mockDictionary: DictionaryEntry[] = [
   {
     headword: '学习',

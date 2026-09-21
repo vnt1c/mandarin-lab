@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { SideNav } from '@/components/layout/SideNav';
 import { DictionarySearch } from '@/components/dictionary/DictionarySearch';
 import { EntryCard } from '@/components/dictionary/EntryCard';
-import { lookupDictionary } from '@/services/dictionaryService';
+import { lookupDictionary } from '@/mocks/dictionary';
 import type { DictionaryEntry } from '@shared';
 import { Loader2 } from 'lucide-react';
 

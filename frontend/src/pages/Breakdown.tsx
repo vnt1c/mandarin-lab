@@ -4,7 +4,9 @@ import { SideNav } from "@/components/layout/SideNav";
 import { SentenceInput } from "@/components/sentence/SentenceInput";
 import { BreakdownPanel } from "@/components/sentence/BreakdownPanel";
 import { analyzeSentence } from "@/services/analysisService";
-import { fetchSaved } from "@/services/savedApi";
+import { useSavedList } from "@/hooks/useSaved";
+import { ApiError } from "@/lib/apiClient";
+import { useMutation } from "@tanstack/react-query";
 import { useAppStore } from "@/stores/appStore";
 import { Loader2 } from "lucide-react";
 import { SentencePanel } from "@/components/sentence/SentencePanel";
@@ -12,54 +14,41 @@ import { toast } from "@/hooks/use-toast";
 
 export default function Breakdown() {
   const { currentAnalysis, setCurrentAnalysis } = useAppStore();
-  const [isLoading, setIsLoading] = useState(false);
   const [inputValue, setInputValue] = useState("");
 
-  const handleAnalyze = async (text: string) => {
-    setIsLoading(true);
-    try {
-      // Check if sentence is already saved (backend)
-      const saved = await fetchSaved();
-      const hit = saved.find((s) => s.sentence === text);
-      if (hit) {
-        setCurrentAnalysis(hit.analysis);
-        return;
-      }
+  const { data: saved = [] } = useSavedList();
 
-      const analysis = await analyzeSentence(text);
-      setCurrentAnalysis(analysis);
-    } catch (error) {
+  const analyze = useMutation({
+    mutationFn: analyzeSentence,
+    onSuccess: setCurrentAnalysis,
+    onError: (error) => {
       console.error("Error analyzing sentence:", error);
-      const errorMessage =
-        error instanceof Error ? error.message : "Failed to analyze sentence";
 
-      if (errorMessage.includes("50") || text.length > 50) {
-        toast({
-          title: "Sentence is too long",
-          description: "Please use 50 characters or less",
-        });
-      } else if (
-        errorMessage.includes("must be a string") ||
-        errorMessage.includes("empty") ||
-        errorMessage.includes("max length") ||
-        errorMessage.includes("unsupported characters") ||
-        errorMessage.includes("at least one Chinese character") ||
-        errorMessage.includes("repeated punctuation") ||
-        errorMessage.includes("contains invisible/control characters")
-      ) {
-        toast({
-          title: "Invalid sentence",
-          description: "Please try a different sentence",
-        });
+      // The backend validates in validateSentence.ts and returns 400 with a
+      // specific reason; anything else is ours to apologise for.
+      if (error instanceof ApiError && error.isClientError) {
+        toast({ title: "Invalid sentence", description: error.message });
       } else {
         toast({
           title: "Server Error",
           description: "Please try again later",
         });
       }
-    } finally {
-      setIsLoading(false);
+    },
+  });
+
+  const isLoading = analyze.isPending;
+
+  const handleAnalyze = (text: string) => {
+    // Reuse a previous analysis if this sentence is already saved. The list is
+    // served from the shared cache, so this costs no request.
+    const hit = saved.find((s) => s.sentence === text);
+    if (hit) {
+      setCurrentAnalysis(hit.analysis);
+      return;
     }
+
+    analyze.mutate(text);
   };
 
   return (

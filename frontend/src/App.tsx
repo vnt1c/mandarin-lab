@@ -1,7 +1,7 @@
 import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ApiError } from "@/lib/apiClient";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useAuthStore } from "@/stores/authStore";
 import { SideNav } from "@/components/layout/SideNav";
@@ -13,9 +13,7 @@ import { X, MessageCircle } from "lucide-react";
 import { useState, useEffect } from "react";
 import { TutorChat } from "@/components/tutor/TutorChat";
 import Services from "./pages/Services";
-import Pricing from "./pages/Pricing";
 import About from "./pages/About";
-import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 import { Button } from "@/components/ui/button";
 import heroImage from "@/assets/hero-watercolor.jpg";
@@ -40,7 +38,18 @@ const AuthenticatedLayout = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 30_000,
+      // A 4xx means the request itself was wrong; retrying just repeats it.
+      retry: (failureCount, error) =>
+        error instanceof ApiError && error.isClientError
+          ? false
+          : failureCount < 2,
+    },
+  },
+});
 
 const App = () => {
   const user = useAuthStore((state) => state.user);
@@ -67,7 +76,6 @@ const App = () => {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <Toaster />
-        <Sonner />
         <BrowserRouter>
           {/* Single global auth modal mount */}
           <AuthModal open={authOpen} onOpenChange={setAuthOpen} />
