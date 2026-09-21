@@ -1,6 +1,5 @@
 // src/pages/Breakdown.tsx
 import { useState } from "react";
-import { SideNav } from "@/components/layout/SideNav";
 import { SentenceInput } from "@/components/sentence/SentenceInput";
 import { BreakdownPanel } from "@/components/sentence/BreakdownPanel";
 import { analyzeSentence } from "@/services/analysisService";
@@ -52,66 +51,60 @@ export default function Breakdown() {
   };
 
   return (
-    <div className="flex min-h-screen w-full">
-      <SideNav />
+    <>
+      <div className="mb-8">
+        <h1 className="text-4xl font-serif font-bold mb-2">
+          Sentence Breakdown
+        </h1>
+        <p className="text-muted-foreground">
+          Enter a Chinese sentence to see detailed analysis with grammar
+          notes
+        </p>
+      </div>
 
-      <main className="flex-1 ml-64 p-8">
-        <div className="max-w-4xl mx-auto">
-          <div className="mb-8">
-            <h1 className="text-4xl font-serif font-bold mb-2">
-              Sentence Breakdown
-            </h1>
-            <p className="text-muted-foreground">
-              Enter a Chinese sentence to see detailed analysis with grammar
-              notes
-            </p>
-          </div>
+      <SentenceInput
+        onAnalyze={handleAnalyze}
+        isLoading={isLoading}
+        value={inputValue}
+        onChange={setInputValue}
+      />
 
-          <SentenceInput
-            onAnalyze={handleAnalyze}
-            isLoading={isLoading}
-            value={inputValue}
-            onChange={setInputValue}
-          />
-
-          {isLoading && (
-            <div className="flex items-center justify-center py-12">
-              <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            </div>
-          )}
-
-          {!isLoading && currentAnalysis && (
-            <>
-              <SentencePanel analysis={currentAnalysis} />
-              <BreakdownPanel analysis={currentAnalysis} />
-            </>
-          )}
-
-          {!isLoading && !currentAnalysis && (
-            <div className="glass-strong rounded-2xl p-12 text-center mt-8">
-              <p className="text-muted-foreground">
-                Enter a sentence above to get started
-              </p>
-              <p className="text-sm text-muted-foreground mt-2">
-                Try:{" "}
-                <button
-                  onClick={() => setInputValue("我爱学中文")}
-                  className="text-primary hover:text-primary/70 cursor-pointer font-medium transition-colors"
-                >
-                  "我爱学中文"
-                </button>{" "}
-                or{" "}
-                <button
-                  onClick={() => setInputValue("今天天气很好")}
-                  className="text-primary hover:text-primary/70 cursor-pointer font-medium transition-colors"
-                >
-                  "今天天气很好"
-                </button>
-              </p>
-            </div>
-          )}
+      {isLoading && (
+        <div className="flex items-center justify-center py-12">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
-      </main>
-    </div>
+      )}
+
+      {!isLoading && currentAnalysis && (
+        <>
+          <SentencePanel analysis={currentAnalysis} />
+          <BreakdownPanel analysis={currentAnalysis} />
+        </>
+      )}
+
+      {!isLoading && !currentAnalysis && (
+        <div className="glass-strong rounded-2xl p-12 text-center mt-8">
+          <p className="text-muted-foreground">
+            Enter a sentence above to get started
+          </p>
+          <p className="text-sm text-muted-foreground mt-2">
+            Try:{" "}
+            <button
+              onClick={() => setInputValue("我爱学中文")}
+              className="text-primary hover:text-primary/70 cursor-pointer font-medium transition-colors"
+            >
+              "我爱学中文"
+            </button>{" "}
+            or{" "}
+            <button
+              onClick={() => setInputValue("今天天气很好")}
+              className="text-primary hover:text-primary/70 cursor-pointer font-medium transition-colors"
+            >
+              "今天天气很好"
+            </button>
+          </p>
+        </div>
+      )}
+    </>
   );
 }
