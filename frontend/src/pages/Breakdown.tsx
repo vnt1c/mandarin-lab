@@ -12,7 +12,8 @@ import { SentencePanel } from "@/components/sentence/SentencePanel";
 import { toast } from "@/hooks/use-toast";
 
 export default function Breakdown() {
-  const { currentAnalysis, setCurrentAnalysis } = useAppStore();
+  const currentAnalysis = useAppStore((s) => s.currentAnalysis);
+  const setCurrentAnalysis = useAppStore((s) => s.setCurrentAnalysis);
   const [inputValue, setInputValue] = useState("");
 
   const { data: saved = [] } = useSavedList();

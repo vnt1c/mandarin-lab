@@ -9,7 +9,8 @@ import { z } from "zod";
  *  - `shared/types/sentence.ts` derives the frontend's TypeScript types via `z.infer`
  *
  * Changing a field here propagates to the API, the validation, and the frontend
- * types at once. Keep `chineseSentenceAnalysis.prompt.ts` in step with it.
+ * types at once, including the descriptions Gemini sees — the prompt carries
+ * behavioural rules only and does not restate this shape.
  */
 
 /**

@@ -68,6 +68,18 @@ app.use(
   })
 );
 
+// Every /api/analyze request costs a Gemini call, so it gets a tighter budget
+// than the cheap CRUD routes it shares the /api prefix with.
+app.use(
+  "/api/analyze",
+  rateLimit({
+    windowMs: 60_000,
+    max: 10, // 10 analyses/min per IP
+    standardHeaders: true,
+    legacyHeaders: false,
+  })
+);
+
 // ---- ROUTES ----
 app.get("/health", (_req, res) => {
   res.json({ ok: true, uptime: process.uptime() });
