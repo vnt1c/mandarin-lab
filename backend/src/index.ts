@@ -21,7 +21,7 @@ if (isProd) {
 // ---- MIDDLEWARE ----
 app.use(requestId);
 
-morgan.token("req-id", (req: any) => req.id);
+morgan.token("req-id", (req) => (req as Request).id);
 
 app.use(
   morgan(

@@ -149,3 +149,14 @@ export const sentenceAnalysisSchema = z.object({
     "Tokens in order of appearance"
   ),
 });
+
+/**
+ * Body of POST /api/saved.
+ *
+ * Only the analysis is sent. The `sentence` and `translation` columns are
+ * derived from it server-side, so a row can never disagree with the blob it
+ * stores, and the client cannot persist a shape the readers don't expect.
+ */
+export const saveAnalysisBodySchema = z.object({
+  analysis: sentenceAnalysisSchema,
+});
