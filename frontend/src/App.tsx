@@ -29,11 +29,19 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   return user ? <>{children}</> : <Navigate to="/" replace />;
 };
 
+/**
+ * Owns the whole authenticated chrome: the fixed sidebar, the `ml-64` gutter
+ * that clears it, and the content column. Pages render their content only —
+ * rendering SideNav again there would stack a second fixed <aside> and nest
+ * one <main> inside another.
+ */
 const AuthenticatedLayout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen w-full">
       <SideNav />
-      <main className="flex-1">{children}</main>
+      <main className="flex-1 ml-64 p-8">
+        <div className="max-w-4xl mx-auto">{children}</div>
+      </main>
     </div>
   );
 };

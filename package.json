@@ -3,15 +3,13 @@
   "version": "1.0.0",
   "private": true,
   "license": "MIT",
-  "workspaces": [
-    "shared",
-    "backend",
-    "frontend"
-  ],
   "scripts": {
-    "dev:backend": "npm run dev --workspace backend",
-    "dev:frontend": "npm run dev --workspace frontend",
-    "build": "npm run build --workspace backend && npm run build --workspace frontend",
-    "typecheck": "npm run typecheck --workspace backend && npm run typecheck --workspace frontend"
-  }
+    "dev": "pnpm --parallel --filter @mandarin-lab/backend --filter @mandarin-lab/frontend run dev",
+    "dev:backend": "pnpm --filter @mandarin-lab/backend run dev",
+    "dev:frontend": "pnpm --filter @mandarin-lab/frontend run dev",
+    "build": "pnpm --filter @mandarin-lab/backend run build && pnpm --filter @mandarin-lab/frontend run build",
+    "typecheck": "pnpm --filter @mandarin-lab/backend run typecheck && pnpm --filter @mandarin-lab/frontend run typecheck",
+    "lint": "pnpm --filter @mandarin-lab/frontend run lint"
+  },
+  "packageManager": "pnpm@10.30.0"
 }

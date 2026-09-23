@@ -21,7 +21,7 @@ if (isProd) {
 // ---- MIDDLEWARE ----
 app.use(requestId);
 
-morgan.token("req-id", (req: any) => req.id);
+morgan.token("req-id", (req) => (req as Request).id);
 
 app.use(
   morgan(
@@ -63,6 +63,18 @@ app.use(
   rateLimit({
     windowMs: 60_000,
     max: 60, // 60 requests/min per IP
+    standardHeaders: true,
+    legacyHeaders: false,
+  })
+);
+
+// Every /api/analyze request costs a Gemini call, so it gets a tighter budget
+// than the cheap CRUD routes it shares the /api prefix with.
+app.use(
+  "/api/analyze",
+  rateLimit({
+    windowMs: 60_000,
+    max: 10, // 10 analyses/min per IP
     standardHeaders: true,
     legacyHeaders: false,
   })

@@ -63,7 +63,7 @@ package.
 ### Prerequisites
 
 - Node.js (LTS recommended)
-- npm
+- pnpm 10+ (`corepack enable pnpm`)
 - A Supabase account (for database and authentication)
 - A Google Cloud project (for Google OAuth)
 - A Gemini API key (for sentence analysis)
@@ -76,12 +76,16 @@ cd mandarin-lab
 
 ### 2. Install dependencies
 
-This is an npm workspace, so install once from the repository root — it covers
+This is a pnpm workspace, so install once from the repository root — it covers
 `shared`, `backend`, and `frontend` together.
 
 ```bash
-npm install
+pnpm install
 ```
+
+pnpm blocks a few dependencies' postinstall scripts. That is deliberate and
+recorded in `pnpm.ignoredBuiltDependencies`: the build, the typecheck and both
+dev servers were verified to work without them.
 
 ### 3. Environment variables
 
@@ -115,17 +119,19 @@ VITE_SUPABASE_ANON_KEY=
 
 ### 5. Run the application
 
-From the repository root, in two terminals:
+From the repository root:
 
 ```bash
-npm run dev:backend
-npm run dev:frontend
+pnpm dev
 ```
+
+That starts the backend and the frontend together, with each line of output
+prefixed by the workspace it came from. To run just one, use `pnpm dev:backend`
+or `pnpm dev:frontend`.
 
 Open `http://localhost:5173` in your browser.
 
-Other root scripts: `npm run typecheck` and `npm run build` run across both
-workspaces.
+Other root scripts: `pnpm typecheck`, `pnpm build` and `pnpm lint`.
 
 ## Notes
 

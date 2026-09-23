@@ -1,0 +1,14 @@
+packages:
+  - shared
+  - backend
+  - frontend
+
+# These packages ship a postinstall script that pnpm blocks by default.
+# Left blocked on purpose: the build, the typecheck and both dev servers were
+# verified to work without them, so running them would only widen the install's
+# attack surface. Listing them here records the decision and silences the nag.
+ignoredBuiltDependencies:
+  - "@google/genai"
+  - "@swc/core"
+  - esbuild
+  - protobufjs

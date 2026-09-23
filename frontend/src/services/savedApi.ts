@@ -19,13 +19,11 @@ export async function fetchSaved(): Promise<SavedAnalysis[]> {
 export async function saveSaved(
   analysis: SentenceAnalysis
 ): Promise<SavedAnalysis> {
+  // The backend derives the sentence/translation columns from the analysis,
+  // so sending them again would only create a way for them to disagree.
   const { row } = await api.post<SavedRowResponse>("/api/saved", {
     auth: true,
-    body: {
-      sentence: analysis.sentence,
-      translation: analysis.translation,
-      analysis,
-    },
+    body: { analysis },
   });
   return row;
 }

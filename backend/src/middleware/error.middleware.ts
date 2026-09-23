@@ -4,7 +4,7 @@ import { isProd } from "@/config/env";
 
 export function errorMiddleware(
   err: unknown,
-  _req: Request,
+  req: Request,
   res: Response,
   _next: NextFunction
 ) {
@@ -14,9 +14,7 @@ export function errorMiddleware(
   }
 
   // Unknown/unexpected errors -> 500
-  const reqId = ( _req as any ).id;
-  console.error(`[req=${reqId}]`, err);
-
+  console.error(`[req=${req.id}]`, err);
 
   const msg = err instanceof Error ? err.message : "Unknown error";
   return res.status(500).json({
