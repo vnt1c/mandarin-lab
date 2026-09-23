@@ -31,5 +31,7 @@
     "resolveFullPaths": true
   },
   "include": ["src/**/*", "../shared/**/*"],
-  "exclude": ["node_modules", "dist"]
+  /* Tests are typechecked by tsconfig.test.json; keeping them out
+     here stops tsc emitting them into dist/. */
+  "exclude": ["node_modules", "dist", "**/*.test.ts", "../shared/**/*.test.ts"]
 }

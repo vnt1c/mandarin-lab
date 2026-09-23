@@ -1,5 +1,7 @@
 # Mandarin Lab
 
+[![CI](https://github.com/vnt1c/mandarin-lab/actions/workflows/ci.yml/badge.svg)](https://github.com/vnt1c/mandarin-lab/actions/workflows/ci.yml)
+
 Mandarin Lab is a Chinese learning web app that creates smart, structured sentence breakdowns to help learners understand Chinese grammar, vocabulary, and real-world usage. The project is under active development, with more advanced learning tools planned.
 
 ## Features
@@ -131,7 +133,29 @@ or `pnpm dev:frontend`.
 
 Open `http://localhost:5173` in your browser.
 
-Other root scripts: `pnpm typecheck`, `pnpm build` and `pnpm lint`.
+Other root scripts: `pnpm typecheck`, `pnpm lint` and `pnpm build`.
+
+## Tests
+
+```bash
+pnpm test
+```
+
+Vitest, run per workspace. The suites concentrate on the places where a
+mistake is expensive rather than chasing coverage:
+
+- **`shared`** — the zod schema, which is the contract Gemini generates
+  against, the API validates with, and the frontend derives its types from.
+  Includes assertions on the emitted JSON Schema, since the prompt was trimmed
+  on the promise that the field descriptions reach the model.
+- **`backend`** — sentence validation (the gate in front of a paid API call),
+  the Gemini adapter's handling of empty, non-JSON and schema-violating
+  responses, the auth middleware, and the error middleware's production
+  masking.
+- **`frontend`** — the API client's error parsing and auth handling, plus a
+  component test for the token chip.
+
+CI runs typecheck, lint, tests and build on every push and pull request.
 
 ## Notes
 

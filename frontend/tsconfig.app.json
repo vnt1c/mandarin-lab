@@ -20,6 +20,9 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
 
+    /* Vitest globals and the jest-dom matcher augmentations used in *.test.tsx */
+    "types": ["vite/client", "vitest/globals", "@testing-library/jest-dom"],
+
     "paths": {
       "@/*": ["./src/*"],
       "@shared": ["../shared/index.ts"],

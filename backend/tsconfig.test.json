@@ -1,0 +1,11 @@
+{
+  /* Typechecks the test files, which tsconfig.json excludes so that `tsc`
+     does not emit them into dist/. Checked, never built. */
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "types": ["node"]
+  },
+  "include": ["src/**/*", "../shared/**/*", "vitest.config.ts"],
+  "exclude": ["node_modules", "dist"]
+}

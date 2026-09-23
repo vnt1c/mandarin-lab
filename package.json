@@ -9,7 +9,8 @@
     "dev:frontend": "pnpm --filter @mandarin-lab/frontend run dev",
     "build": "pnpm --filter @mandarin-lab/backend run build && pnpm --filter @mandarin-lab/frontend run build",
     "typecheck": "pnpm --filter @mandarin-lab/backend run typecheck && pnpm --filter @mandarin-lab/frontend run typecheck",
-    "lint": "pnpm --filter @mandarin-lab/frontend run lint"
+    "lint": "pnpm --filter @mandarin-lab/frontend run lint",
+    "test": "pnpm --filter @mandarin-lab/shared run test && pnpm --filter @mandarin-lab/backend run test && pnpm --filter @mandarin-lab/frontend run test"
   },
   "packageManager": "pnpm@10.30.0"
 }
